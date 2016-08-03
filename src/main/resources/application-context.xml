@@ -1,0 +1,46 @@
+<beans xmlns="http://www.springframework.org/schema/beans">
+
+    <bean id="mailService" class="spring.bean.MailService">
+        <property name="LogService" ref="LogService"></property>
+        <property name="mailServer" value="smtp.gmail.com"/>
+        <property name="port" value="smtp"/>
+        <property name="protocol" value="9999"/>
+        <property name="serviceConfig">
+        <!-- <property/> or <constructor-arg/> elements defines inner bean. -->
+        <!-- no ID is required for inner beans hence it is always anonymous and belongs to parent bean
+             It is not possible to inject or autowire inner beans in other beans  -->
+        <bean class="spring.bean.MailServiceConfig"> <!-- inner bean -->
+            <property name="active" value="true"/>
+            <property name="maxHourlyEmailLimit" value="25000"/>
+        </bean>
+        </property>
+    </bean>
+
+    <bean id="LogService" class="spring.bean.LogService"/>
+
+    <bean id="dataSource" class="spring.bean.DataSource"/>
+    <!-- Constructor dependency injection -->
+    <!-- mainly used for required properties -->
+    <!--
+        scopes are defined singleton,prototype,session,request,global session and application
+        singleton (Default Scope): a single instance of the object will be created inside framework
+        prototype: a new instance of the object will be created each time the bean is referenced
+        session: it is used in web environment and a new instance will be created per user web HTTP session
+        request: it is used in web environment and a new instance will be created per each request
+        global session: same as session and used in web applications, typically used in portlet context
+        application: it is used in web applications and Scopes a single bean definition in
+            a ServletContext.
+    -->
+
+    <bean id="databaseService" class="spring.bean.DatabaseService" scope="singleton">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+    <bean id="LoginService" class="spring.bean.LoginService">
+        <property name="databaseService" ref="databaseService"/>
+        <constructor-arg ref="LogService"/>
+    </bean>
+
+
+
+</beans>
